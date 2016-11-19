@@ -14,7 +14,9 @@ import java.net.URL;
  * Created by Elijah on 11/19/2016.
  */
 
-enum DownloadStatus { IDLE, PROCESSING, NOT_INITIALISED, FAILED_OR_EMPTY, OK}
+enum DownloadStatus {
+    IDLE, PROCESSING, NOT_INITIALISED, FAILED_OR_EMPTY, OK
+}
 
 public class GetRawData extends AsyncTask<String, Void, String> {
 
@@ -22,7 +24,7 @@ public class GetRawData extends AsyncTask<String, Void, String> {
 
     private DownloadStatus mDownloadStatus;
 
-    public GetRawData(){
+    public GetRawData() {
         this.mDownloadStatus = DownloadStatus.IDLE;
     }
 
@@ -36,12 +38,12 @@ public class GetRawData extends AsyncTask<String, Void, String> {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
 
-        if(strings == null){
+        if (strings == null) {
             mDownloadStatus = DownloadStatus.NOT_INITIALISED;
             return null;
         }
 
-        try{
+        try {
             mDownloadStatus = DownloadStatus.PROCESSING;
             URL url = new URL(strings[0]);
 
@@ -54,13 +56,35 @@ public class GetRawData extends AsyncTask<String, Void, String> {
             StringBuilder result = new StringBuilder();
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-        } catch (MalformedURLException e){
-            Log.e(TAG, "doInBackground: Invalid URL" + e.getMessage() );
-        } catch (IOException e){
-            Log.e(TAG, "doInBackground: IO Exception reading data" + e.getMessage() );
-        } catch(SecurityException e){
-            Log.e(TAG, "doInBackground: Security Exception, Needs Permission" + e.getMessage() );
+            String line;
+            while (null != (line = reader.readLine())) {
+                result.append(line).append("\n");
+            }
+
+            mDownloadStatus = DownloadStatus.OK;
+            return result.toString();
+
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "doInBackground: Invalid URL" + e.getMessage());
+        } catch (IOException e) {
+            Log.e(TAG, "doInBackground: IO Exception reading data" + e.getMessage());
+        } catch (SecurityException e) {
+            Log.e(TAG, "doInBackground: Security Exception, Needs Permission" + e.getMessage());
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "doInBackground: Error closing Stream " + e.getMessage());
+                }
+            }
         }
+
+        // If this is fired, there is a serious issue
+        mDownloadStatus = DownloadStatus.FAILED_OR_EMPTY;
         return null;
     }
 
