@@ -30,7 +30,7 @@ public class GetRawData extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String s) {
-        super.onPostExecute(s);
+        Log.d(TAG, "onPostExecute: Parameter = " + s);
     }
 
     @Override
@@ -56,8 +56,7 @@ public class GetRawData extends AsyncTask<String, Void, String> {
             StringBuilder result = new StringBuilder();
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-            String line;
-            while (null != (line = reader.readLine())) {
+            for(String line = reader.readLine(); line != null; line = reader.readLine()){
                 result.append(line).append("\n");
             }
 
@@ -83,7 +82,7 @@ public class GetRawData extends AsyncTask<String, Void, String> {
             }
         }
 
-        // If this is fired, there is a serious issue
+        // If this is fired, there is an issue
         mDownloadStatus = DownloadStatus.FAILED_OR_EMPTY;
         return null;
     }
