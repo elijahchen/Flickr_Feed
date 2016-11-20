@@ -1,10 +1,12 @@
 package com.elijahcodes.myflickr;
 
+import java.io.Serializable;
+
 /**
  * Created by Elijah on 11/19/2016.
  */
 
-public class Photo {
+public class Photo implements Serializable{
 
     private String mTitle;
     private String mAuthor;
