@@ -24,7 +24,7 @@ public class GetRawData extends AsyncTask<String, Void, String> {
     private DownloadStatus mDownloadStatus;
     private final OnDownloadComplete mCallback;
 
-    interface OnDownloadComplete{
+    interface OnDownloadComplete {
         void onDownloadComplete(String s, DownloadStatus status);
     }
 
@@ -33,18 +33,19 @@ public class GetRawData extends AsyncTask<String, Void, String> {
         mCallback = callback;
     }
 
-    void runInSameThread(String s){
+    void runInSameThread(String s) {
         Log.d(TAG, "runInSameThread: Starts");
 
-        onPostExecute(doInBackground(s));
+        if(mCallback != null){
+            mCallback.onDownloadComplete(doInBackground(s), mDownloadStatus);
+        }
 
         Log.d(TAG, "runInSameThread: Ends");
     }
 
     @Override
     protected void onPostExecute(String s) {
-        Log.d(TAG, "onPostExecute: Parameter = " + s);
-        if(mCallback != null){
+        if (mCallback != null) {
             mCallback.onDownloadComplete(s, mDownloadStatus);
         }
         Log.d(TAG, "onPostExecute: Ends");
@@ -73,7 +74,7 @@ public class GetRawData extends AsyncTask<String, Void, String> {
             StringBuilder result = new StringBuilder();
             reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
-            for(String line = reader.readLine(); line != null; line = reader.readLine()){
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 result.append(line).append("\n");
             }
 
